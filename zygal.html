@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas Pixel Data Download</title>
+  <style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .info{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    header{
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: end;
+        background-color: #d6d9dc;
+        width: 100%;
+        height: fit-content;
+    }
+
+    a{
+
+        font-size: 30px;
+        color: #606267;
+    }
+
+    .fa-solid{
+        padding: 10px 15px;
+    }
+
+  </style>
+</head>
+<body>
+    <header>
+        
+    <a id="downloadLink" download="canvas_data.txt" href="#"><i class="fa-sharp fa-solid fa-download"></i></a>
+   </header>
+<div class="info">
+  <canvas id="myCanvas" width="16" height="34"></canvas>
+</div>
+  
+
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Customize font properties
+    const fontSize = 20;
+    const fontFamily = 'Arial';
+    const fontColor = 'red';
+
+    // Draw the character 'X' in the center of the canvas
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.fillStyle = fontColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('X', canvas.width / 2, canvas.height / 2);
+
+    const downloadLink = document.getElementById('downloadLink');
+
+    downloadLink.addEventListener('click', () => {
+      const canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let hexData = '';
+
+      for (let i = 0; i < canvasData.length; i += 4) {
+        const red = canvasData[i].toString(16).padStart(2, '0');
+        const green = canvasData[i + 1].toString(16).padStart(2, '0');
+        const blue = canvasData[i + 2].toString(16).padStart(2, '0');
+        const alpha = canvasData[i + 3].toString(16).padStart(2, '0');
+        hexData += '0x' + red + green + blue + alpha + ', ';
+
+        // Add line breaks for formatting (optional)
+        if ((i + 4) % (4 * canvas.width) === 0) {
+          hexData += '\n';
+        }
+      }
+
+      const blob = new Blob([hexData], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      downloadLink.href = url;
+    });
+  </script>
+  
+  <script src="https://kit.fontawesome.com/53f913e2cc.js" crossorigin="anonymous"></script>
+</body>
+</html>
